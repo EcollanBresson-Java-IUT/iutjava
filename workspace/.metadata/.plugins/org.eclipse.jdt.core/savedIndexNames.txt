@@ -6,7 +6,6 @@ INDEX VERSION 1.127+/Users/charlesecollan/Documents/Data/Etudes/Etudes supérieu
 1769317737.index
 2178737305.index
 2456149042.index
-3344260752.index
 2885545355.index
 2211732093.index
 3794497040.index
