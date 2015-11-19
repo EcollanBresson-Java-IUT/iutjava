@@ -20,7 +20,7 @@ public class ApplicationSession {
 		/* Définir US comme locale par défaut */
 		Locale.setDefault(Locale.US);/* à compléter */
 		locale = Locale.getDefault();
-		resourceBundle = ResourceBundle.getBundle("edu.iut.resources.strings", locale);/* à compléter */
+		resourceBundle = ResourceBundle.getBundle("edu.iut.resources.strings.res", this.locale);/* à compléter */
 		
 		sessionGuiLogger = Logger.getLogger("MyGUILogger");
 		sessionGuiLogger.setLevel(Level.ALL);/* Tous les messages doivent être affiché */
@@ -46,7 +46,7 @@ public class ApplicationSession {
 	public void setLocale(Locale locale){
 		this.locale = locale;
 		Locale.setDefault(this.locale);
-		resourceBundle= ResourceBundle.getBundle("edu.iut.resources.strings", locale);/* récupérer les resources */
+		resourceBundle= ResourceBundle.getBundle("edu.iut.resources.strings", this.locale);/* récupérer les resources */
 	}
 	
 	public String getString(String key) {

@@ -27,7 +27,7 @@ public abstract class AbstractApplicationLog implements IApplicationLog {
 	}
 	@Override
 	public IApplicationLogListener[] getApplicationLogListeners() {
-		return (IApplicationLogListener[])listeners.toArray();
+		return (IApplicationLogListener[]) listeners.toArray();
 	}
 	
 	protected void fireMessage(String level, String message) {
