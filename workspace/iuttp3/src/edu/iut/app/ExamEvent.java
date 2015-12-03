@@ -9,6 +9,7 @@ public class ExamEvent {
 		this.jury = new ArrayList<Person>();
 		this.classroom = new Classroom();
 		this.documents = new ArrayList<Document>();
+		this.examDate = null;
 	}
 	
 	public ExamEvent(Date date, Person person, ArrayList<Person> jury,

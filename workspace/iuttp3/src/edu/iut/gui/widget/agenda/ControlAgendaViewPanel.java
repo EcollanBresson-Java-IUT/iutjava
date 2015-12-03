@@ -2,6 +2,7 @@ package edu.iut.gui.widget.agenda;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
@@ -30,6 +31,26 @@ public class ControlAgendaViewPanel extends JPanel {
 		this.agendaViewLayout = layerLayout;
 		this.contentPane = contentPane;
 		/** EX3: REMPLACEMENT DU BOUTON NEXT */
+		JPanel setDate = new JPanel();
+        Calendar cal = Calendar.getInstance();
+        ApplicationSession app = null;
+        
+        String[] months = app.instance().getMonths();
+        JComboBox monthsList = new JComboBox(months);
+        monthsList.setSelectedIndex(cal.get(Calendar.MONTH));
+        
+        String[] days = app.instance().getDays();
+        JComboBox daysList = new JComboBox(days);
+        daysList.setSelectedIndex(cal.get(Calendar.DAY_OF_WEEK));
+
+        SpinnerModel spinner = new SpinnerNumberModel(cal.get(Calendar.YEAR), 2010, 2020, 1);
+        JSpinner spin = new JSpinner(spinner);
+       
+        setDate.add(spin);
+        setDate.add(monthsList);
+        setDate.add(daysList);
+        setDate.setLayout(new GridLayout(3,1));	
+        add(setDate);
 	}
 	
 	public int getYear() {
