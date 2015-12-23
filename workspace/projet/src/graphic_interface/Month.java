@@ -224,6 +224,7 @@ public class Month extends CurrentView implements ActionListener {
 		switch(BoutonPresse) {
 		case "suivant" :
 			this.changeMonth(1);
+			
 			//Répercuter le changement sur la JFrame
 			break;
 		case "precedent" :
