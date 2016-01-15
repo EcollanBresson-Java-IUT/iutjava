@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import javax.swing.JFrame;
@@ -16,13 +18,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
+import exception.ApplyException;
+import presentation.Presentation;
 import session.Planning;
 import session.Session;
+import xml.XMLFileLoader;
 import xml.XMLFileSave;
 import graphic_interface.CurrentView;
 import graphic_interface.CurrentView.ActiveView;
 import graphic_interface.Month;
-import graphic_interface.SelectDate;
+import graphic_interface.PresentationPanel;
 
 public class MainFrame extends JFrame {
 	
@@ -34,10 +39,10 @@ public class MainFrame extends JFrame {
 	private JPanel dayView;
 	private JPanel weekView;
 	private JPanel monthView;
+	private JPanel disponibility;
 	private JPanel menuPane;
 	private CardLayout mainPaneLayout;
 	private CurrentView cv;
-	private SelectDate d1;
 	
 	/**Initialise the main elements of the frame like the panel containing the month view, the day view and the week view
 	 * And the panel containing the menu and the date selector
@@ -53,17 +58,16 @@ public class MainFrame extends JFrame {
 		this.dayView = cv.getView(ActiveView.DAY_VIEW);
 		this.weekView = cv.getView(ActiveView.WEEK_VIEW);
 		this.monthView = cv.getView(ActiveView.MONTH_VIEW);
-
 	}
 	
-	/**setup the element of the frame, like the three view, the menu and the date selector
-	 * 
+	/**
+	 * setup the element of the frame, like the three view, the menu and the date selector
 	 */
 	public void setupUI() {
 		
-		this.mainPane.add(dayView,ActiveView.DAY_VIEW.name());
-		this.mainPane.add(weekView,ActiveView.WEEK_VIEW.name());
-		this.mainPane.add(monthView,ActiveView.MONTH_VIEW.name());
+		this.mainPane.add(this.dayView,ActiveView.DAY_VIEW.name());
+		this.mainPane.add(this.weekView,ActiveView.WEEK_VIEW.name());
+		this.mainPane.add(this.monthView,ActiveView.MONTH_VIEW.name());
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,menuPane, mainPane);
 		this.setContentPane(splitPane);
@@ -79,10 +83,9 @@ public class MainFrame extends JFrame {
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					//Message d'attente
-					String message = Session.instance().getString("messageLoad");
-					String messageName = Session.instance().getString("load");
-				    JOptionPane.showMessageDialog(null,message,messageName, JOptionPane.INFORMATION_MESSAGE);
+					try {
+						MainFrame.instance().addPresentations(XMLFileLoader.LoadXMLFile());
+					} catch (Exception e) {new ApplyException(e.toString());}
 				}			
 			});
 			menu.add(menuItem);
@@ -91,13 +94,9 @@ public class MainFrame extends JFrame {
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					//XMLFileSave.saveFile(presentations);
-					
-					//Message d'attente
-					String message = Session.instance().getString("messageSave");
-					String messageName = Session.instance().getString("save");
-				    JOptionPane.showMessageDialog(null,message,messageName, JOptionPane.INFORMATION_MESSAGE);
-				
+					try {
+						XMLFileSave.saveFile(MainFrame.instance().getPlanning());
+					} catch (Exception e) {new ApplyException(e.toString());}
 				}			
 			});
 			menu.add(menuItem);
@@ -112,7 +111,9 @@ public class MainFrame extends JFrame {
 					if (response != JOptionPane.CANCEL_OPTION) {
 						if (response == JOptionPane.YES_OPTION){
 							//Sauvegarder dans un document XML
-							//XMLFileSave.saveFile(presentations);
+							try {
+								XMLFileSave.saveFile(MainFrame.instance().getPlanning());
+							} catch (Exception e) {new ApplyException(e.toString());}
 							
 							//Message d'attente
 							String message = Session.instance().getString("messageQuit");
@@ -208,10 +209,10 @@ public class MainFrame extends JFrame {
 				});
 				menuSub.add(menuItem);
 
-
 		this.menuPane.setLayout(new BorderLayout());
 		this.menuPane.add(menuBar, BorderLayout.NORTH);
-		this.menuPane.add(new SelectDate(mainPaneLayout, mainPane), BorderLayout.CENTER);
+		this.menuPane.add(new PresentationPanel(this.planning), BorderLayout.CENTER);
+		this.menuPane.setSize(mainPane.getWidth()/3, menuPane.getHeight());
 		this.pack();
 		this.mainPaneLayout.next(this.mainPane);
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -239,14 +240,36 @@ public class MainFrame extends JFrame {
 	}
 	
 	/**Return the unique instance of MainFrame
-	 * 
-	 * @return
+	 * @return MainFrame
 	 */
 	public static MainFrame instance(){
 		if (frame == null){
 			frame = new MainFrame("Agenda");
 		}
 		return frame;
+	}
+	
+	public GregorianCalendar getCalendar(){
+		return ((Month) this.monthView).getCalendar();
+	}
+	
+	public ArrayList<Presentation> getPlanning(){
+		return this.planning;
+	}
+	
+	public void addPresentation(Presentation presentations){
+		this.planning.add(presentations);
+	}
+	
+	public void changePresentation(Presentation presentation, int index){
+		this.planning.remove(index);
+		this.planning.add(index, presentation);
+	}
+	
+	public void addPresentations(ArrayList<Presentation> presentations){
+		this.planning.addAll(presentations);
+		init();
+		setupUI();
 	}
 
 }

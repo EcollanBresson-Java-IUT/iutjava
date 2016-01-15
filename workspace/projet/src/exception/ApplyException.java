@@ -5,7 +5,7 @@ import session.Session;
 /**
  * This class handle the Exception of the program
  * Please note that the program isn't complete yet, so this class can't show his full potential
- * @author Charles Ecollan, Quentin Bresson, Hubert Mouginot
+ * @author Charles Ecollan, Quentin Bresson, Hubert Mouginot, Thomas Tournoux and Eric Martelot
  *
  */
 public class ApplyException extends Exception {

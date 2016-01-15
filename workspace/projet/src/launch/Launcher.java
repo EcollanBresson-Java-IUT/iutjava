@@ -13,7 +13,7 @@ public final class Launcher {
 	
 	public static void main(String[] args) {
 
-		//Permet d'éviter diverses erreurs à la compilation, notamment sur le constructeur de Month
+		//Permet d'eviter diverses erreurs à la compilation, notamment sur le constructeur de Month
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				MainFrame.instance();

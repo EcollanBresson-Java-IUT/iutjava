@@ -2,7 +2,6 @@ package graphic_interface;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,7 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import session.Session;
-import frame.MainFrame;
 import graphic_interface.Week.WeekDayNames;
 
 public class Month extends CurrentView implements ActionListener {
@@ -25,6 +23,10 @@ public class Month extends CurrentView implements ActionListener {
 	private JPanel topPanel;
 	private JPanel underPanel;
 	private GregorianCalendar calendar;
+	
+	public GregorianCalendar getCalendar(){
+		return this.calendar;
+	}
 
 	/**
 	 * Constructor of Month class
@@ -32,7 +34,6 @@ public class Month extends CurrentView implements ActionListener {
 	public Month () {
 		super(ActiveView.MONTH_VIEW);
 		this.calendar = new GregorianCalendar();
-		this.changeMonth(1);
 		this.setupMonth();
 	}
 		
@@ -44,7 +45,7 @@ public class Month extends CurrentView implements ActionListener {
 		topPanel = new JPanel();
 		underPanel = new JPanel();
 		
-		GridLayout daysOfMonthLayout = new GridLayout(5,7);		
+		GridLayout daysOfMonthLayout = new GridLayout(5,7);
 		underPanel.setLayout(daysOfMonthLayout);
 		this.setLayout(new BorderLayout());
 		
@@ -77,9 +78,9 @@ public class Month extends CurrentView implements ActionListener {
 		}
 
 		JLabel monthDate = new JLabel(month + " " + currentYear);
-		JButton previous = new JButton("Precedent");
+		JButton previous = new JButton(Session.instance().getString("previous"));
 		previous.addActionListener(this);
-		JButton next = new JButton("Suivant");
+		JButton next = new JButton(Session.instance().getString("next"));
 		next.addActionListener(this);
 		topPanel.add(previous);
 		topPanel.add(monthDate);
@@ -103,17 +104,24 @@ public class Month extends CurrentView implements ActionListener {
 				if(indice == 0) indice = 7;
 			}
 		}
-		for (int i = 0 ; i < indice; i++){
+		int count;
+		for (count = 1 ; count < indice; count++){
 			day = new Day(ActiveView.MONTH_VIEW, WeekDayNames.EMPTYDAY);
 			underPanel.add(day);
 		}
-		for (int di = 0;di<calendar.getActualMaximum(Calendar.DAY_OF_MONTH);di++) {
+		for (int di = 0; di < 35-count ;di++) {
 
-			day = new Day(ActiveView.MONTH_VIEW,WeekDayNames.values()[indice]);
-			day.setBorder(BorderFactory.createLineBorder(Color.black));
-			if(indice == 7) indice = 0;
-			indice++;
-			underPanel.add(day);
+			if (di < calendar.getActualMaximum(Calendar.DAY_OF_MONTH)){
+				day = new Day(ActiveView.MONTH_VIEW,WeekDayNames.values()[indice]);
+				day.setBorder(BorderFactory.createLineBorder(Color.black));
+				if(indice == 7) indice = 0;
+				indice++;
+				underPanel.add(day);
+			}else{
+				day = new Day(ActiveView.MONTH_VIEW, WeekDayNames.EMPTYDAY);
+				underPanel.add(day);
+			}
+			
 		}
 		this.add(topPanel, BorderLayout.PAGE_START);
 		this.add(underPanel, BorderLayout.CENTER);
@@ -132,10 +140,16 @@ public class Month extends CurrentView implements ActionListener {
 	 * Change the view depending of changes like a movement in time or a change of language
 	 */
 	public void changeMonthView() {
+		
+		this.removeAll();
+		topPanel.removeAll();
+		underPanel.removeAll();
+		this.setLayout(new BorderLayout());
+		
 		topPanel = new JPanel();
 		underPanel = new JPanel();
 		
-		GridLayout daysOfMonthLayout = new GridLayout(5,7);		
+		GridLayout daysOfMonthLayout = new GridLayout(5,7);	
 		underPanel.setLayout(daysOfMonthLayout);
 		this.setLayout(new BorderLayout());
 		
@@ -168,9 +182,9 @@ public class Month extends CurrentView implements ActionListener {
 		}
 
 		JLabel monthDate = new JLabel(month + " " + currentYear);
-		JButton previous = new JButton("Precedent");
+		JButton previous = new JButton(Session.instance().getString("previous"));
 		previous.addActionListener(this);
-		JButton next = new JButton("Suivant");
+		JButton next = new JButton(Session.instance().getString("next"));
 		next.addActionListener(this);
 		topPanel.add(previous);
 		topPanel.add(monthDate);
@@ -194,23 +208,29 @@ public class Month extends CurrentView implements ActionListener {
 				if(indice == 0) indice = 7;
 			}
 		}
-		for (int i = 0 ; i < indice; i++){
+		int count;
+		for (count = 1 ; count < indice; count++){
 			day = new Day(ActiveView.MONTH_VIEW, WeekDayNames.EMPTYDAY);
 			underPanel.add(day);
 		}
-		for (int di = 0;di<calendar.getActualMaximum(Calendar.DAY_OF_MONTH);di++) {
-
-			day = new Day(ActiveView.MONTH_VIEW,WeekDayNames.values()[indice]);
-			day.setBorder(BorderFactory.createLineBorder(Color.black));
-			if(indice == 7) indice = 0;
-			indice++;
-			underPanel.add(day);
+		for (int di = 0; di < 35-count ;di++) {
+			if (di < calendar.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+				//Fixe un probleme lorsque la date actuelle est un multiple de 7
+				if(indice >= 8) indice = indice%7;
+				day = new Day(ActiveView.MONTH_VIEW,WeekDayNames.values()[indice]);
+				day.setBorder(BorderFactory.createLineBorder(Color.black));
+				if(indice >= 7) indice = 0;
+				indice++;
+				underPanel.add(day);
+			}else{
+				day = new Day(ActiveView.MONTH_VIEW, WeekDayNames.EMPTYDAY);
+				underPanel.add(day);
+			}
+			
 		}
-		this.remove(topPanel);
-		this.remove(underPanel);
-		this.add(topPanel);
-		this.add(underPanel);
-		this.validate();
+		this.add(topPanel, BorderLayout.PAGE_START);
+		this.add(underPanel, BorderLayout.CENTER);
+		this.revalidate();
 	}
 
 
@@ -220,16 +240,15 @@ public class Month extends CurrentView implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
-		String BoutonPresse = ((String) arg0.getActionCommand().toLowerCase());
-		switch(BoutonPresse) {
-		case "suivant" :
+		String btnPresse = ((String) arg0.getActionCommand().toLowerCase());
+		switch(btnPresse) {
+		case "suivant"  :
+		case "next" :
 			this.changeMonth(1);
-			
-			//Répercuter le changement sur la JFrame
 			break;
 		case "precedent" :
+		case "previous":
 			this.changeMonth(-1);
-			//Répercuter le changement sur la JFrame
 			break;
 		default:break;
 		}

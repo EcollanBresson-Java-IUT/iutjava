@@ -21,6 +21,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import presentation.Presentation;
+import exception.ApplyException;
 import frame.MainFrame;
 
 public class XMLFileSave {
@@ -60,27 +61,32 @@ public class XMLFileSave {
 				soutenance.setAttribute("duration", "01:00:00");
 
 				Element eventStudent = document.createElement("Student");
-				eventStudent.appendChild(document.createTextNode("Fonction " + presentations.get(event_i).getStudent().getFunction()));
-				eventStudent.appendChild(document.createTextNode("Firstname " + presentations.get(event_i).getStudent().getFirstname()));
-				eventStudent.appendChild(document.createTextNode("Lastname " + presentations.get(event_i).getStudent().getLastname()));
-				eventStudent.appendChild(document.createTextNode("Email " + presentations.get(event_i).getStudent().getMail()));
-				eventStudent.appendChild(document.createTextNode("Phone " + presentations.get(event_i).getStudent().getTel()));
+				eventStudent.setAttribute("Firstname", presentations.get(event_i).getStudent().getFirstname());
+				eventStudent.setAttribute("Lastname", presentations.get(event_i).getStudent().getLastname());
+				eventStudent.setAttribute("Email", presentations.get(event_i).getStudent().getMail());
+				eventStudent.setAttribute("Phone", presentations.get(event_i).getStudent().getTel());
 
 				Element eventJury = document.createElement("Jury_Members");
+				Element juryMember;
 				for (int i = 0 ; i < presentations.get(event_i).getJury().size() ; i++) {
-					eventJury.appendChild(document.createTextNode("Fonction " + presentations.get(event_i).getJury().get(i).getFunction()));
-					eventJury.appendChild(document.createTextNode("Firstname " + presentations.get(event_i).getJury().get(i).getFirstname()));
-					eventJury.appendChild(document.createTextNode("Lastname " + presentations.get(event_i).getJury().get(i).getLastname()));
-					eventJury.appendChild(document.createTextNode("Email " + presentations.get(event_i).getJury().get(i).getMail()));
-					eventJury.appendChild(document.createTextNode("Phone " + presentations.get(event_i).getJury().get(i).getTel()));
+					
+					juryMember = document.createElement("juryMember");
+					juryMember.setAttribute("Firstname", presentations.get(event_i).getJury().get(i).getFirstname());
+					juryMember.setAttribute("Lastname", presentations.get(event_i).getJury().get(i).getLastname());
+					juryMember.setAttribute("Email", presentations.get(event_i).getJury().get(i).getMail());
+					juryMember.setAttribute("Phone", presentations.get(event_i).getJury().get(i).getTel());
+					eventJury.appendChild(juryMember);
 				}
 
 				Element eventRoom = document.createElement("Room");
 				eventRoom.setAttribute("Number", presentations.get(event_i).getClassroom().getClassRoomNumber());
 
-				Element eventDocument = document.createElement("Document");
-				for (int j = 0 ; j < presentations.get(event_i).getJury().size() ; j++) {
-					eventDocument.appendChild(document.createTextNode("Name " + presentations.get(event_i).getDocuments().get(j).getDocumentName()));
+				Element eventDocument = document.createElement("Documents");
+				Element docName;
+				for (int j = 0 ; j < presentations.get(event_i).getDocuments().size() ; j++) {
+					docName = document.createElement("document");
+					docName.setAttribute("Name", presentations.get(event_i).getDocuments().get(j).getDocumentName());
+					eventDocument.appendChild(docName);
 				}
 
 				soutenance.appendChild(eventStudent);
@@ -101,6 +107,7 @@ public class XMLFileSave {
 
 		} catch (Exception e) {
 			System.err.println("An error has occured : " + e);
+			new ApplyException(e.toString());
 		}
 	}
 
@@ -117,7 +124,7 @@ public class XMLFileSave {
 			dateString = sdfr.format( indate );
 		}
 		catch (Exception ex ){
-			System.err.println(ex);
+			new ApplyException(ex.toString());
 		}
 		return dateString;
 	}
@@ -128,7 +135,7 @@ public class XMLFileSave {
 		try {
 			date = formatter.parse(indate);
 		} catch (ParseException e) {
-			e.printStackTrace();
+			new ApplyException(e.toString());
 		}
 		return date;
 	}

@@ -35,7 +35,7 @@ public class CurrentView extends JPanel{
 	 * Choose a pre-determined default view
 	 */
 	public CurrentView() {
-		this.activeView = ActiveView.WEEK_VIEW;
+		this.activeView = ActiveView.MONTH_VIEW;
 	}
 
 	/**

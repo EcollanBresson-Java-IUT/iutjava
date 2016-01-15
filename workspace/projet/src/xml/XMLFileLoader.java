@@ -17,6 +17,7 @@ import presentation.Classroom;
 import presentation.Person;
 import presentation.Person.PersonFunction;
 import presentation.Presentation;
+import exception.ApplyException;
 import frame.MainFrame;
 
 public class XMLFileLoader {
@@ -25,14 +26,14 @@ public class XMLFileLoader {
 	 * @return ArrayList<Presentation>
 	 * @throws Exception
 	 */
-	public ArrayList<Presentation> LoadXMLFile() throws Exception {
+	public static ArrayList<Presentation> LoadXMLFile() throws Exception {
 		
 		ArrayList<Presentation> presentations = new ArrayList<Presentation>();
 		try{
 			
 			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-			Document doc = docBuilder.parse (new File(this.chooseFile()));
+			Document doc = docBuilder.parse (new File(new XMLFileLoader().chooseFile()));
 			
 			doc.getDocumentElement().normalize();
 			
@@ -45,29 +46,29 @@ public class XMLFileLoader {
             	ArrayList<Person> jury = new ArrayList<Person>();
             	Date date = new Date();
             	
-            	NodeList val;
+            	NodeList juryEl;
             	
             	Element presentation = (Element) listOfPresentation.item(event_i);
             	String attr1 = presentation.getAttribute("date");
             	String attr2 = presentation.getAttribute("duration");
             	
-            	date = XMLFileSave.convertStringToDate(attr1);
+            	date = XMLFileSave.convertStringToDate(attr1+attr2);
             	
             	NodeList studentList = presentation.getElementsByTagName("Student");
-            	val = studentList.item(0).getChildNodes();
-            	String firstname = val.item(1).getTextContent();
-            	String lastName = val.item(2).getTextContent();
-            	String email = val.item(3).getTextContent();
-            	String phone = val.item(4).getTextContent();
+            	Element stu = (Element) studentList.item(0);
+            	String firstname = stu.getAttribute("Firstname");
+            	String lastName = stu.getAttribute("Lastname");
+            	String email = stu.getAttribute("Email");
+            	String phone = stu.getAttribute("Phone");
             	student = new Person(PersonFunction.STUDENT, firstname, lastName, email, phone);
             	
             	NodeList juryList = presentation.getElementsByTagName("Jury_Members");
             	for (int i = 0 ; i < juryList.getLength(); i++) {
-            		val = juryList.item(i).getChildNodes();
-            		firstname = val.item(0).getTextContent();
-                	lastName = val.item(1).getTextContent();
-                	email = val.item(2).getTextContent();
-                	phone = val.item(3).getTextContent();
+            		Element juryElement = (Element) juryList.item(i);
+            		firstname = juryElement.getAttribute("Firstname");
+                	lastName = juryElement.getAttribute("Lastname");
+                	email = juryElement.getAttribute("Email");
+                	phone = juryElement.getAttribute("Phone");
                 	jury.add(new Person(PersonFunction.JURY, firstname, lastName, email, phone));
             	}
             	
@@ -77,10 +78,10 @@ public class XMLFileLoader {
             	c1.setClassroomNumber(classroomnumber);
             	
             	String docName = "";
-            	NodeList docList = presentation.getElementsByTagName("Document");
-            	for (int i = 0 ; i < juryList.getLength(); i++) {
-            		val = docList.item(i).getChildNodes();
-            		docName = val.item(0).getTextContent();
+            	NodeList docList = presentation.getElementsByTagName("Documents");
+            	for (int i = 0 ; i < docList.getLength(); i++) {
+            		Element docElement = (Element) docList.item(i);
+            		docName = docElement.getAttribute("Name");
                 	docPres.add(new presentation.Document(docName));
             	}
             	presentations.add(new Presentation(date, student, jury, c1, docPres));
@@ -88,6 +89,7 @@ public class XMLFileLoader {
 			
 		}catch(Exception e){
 			System.err.println("Error while loading the XML file");
+			new ApplyException(e.toString());
 		}
 		
 		return presentations;
@@ -104,12 +106,9 @@ public class XMLFileLoader {
 	        "XML files", "xml");
 	    chooser.setFileFilter(filter);
 	    int returnVal = chooser.showOpenDialog(MainFrame.instance());
-	    if(returnVal == JFileChooser.APPROVE_OPTION) {
-	       System.out.println("You chose to open this file: " +
-	            chooser.getSelectedFile().getName());
-	    }
+	    if(returnVal == JFileChooser.APPROVE_OPTION) return chooser.getSelectedFile().getAbsolutePath();
+	    else return null;
 		
-		return chooser.getSelectedFile().getAbsolutePath();
 	}
 
 }
